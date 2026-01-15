@@ -32,11 +32,33 @@ export function parseDateFromUrl(dateString: string): Date | null {
 }
 
 /**
- * Format date for display (e.g., "4 February")
+ * Get ordinal suffix for a day number (st, nd, rd, th)
+ */
+function getOrdinalSuffix(day: number): string {
+    if (day >= 11 && day <= 13) {
+        return 'th';
+    }
+    switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+    }
+}
+
+/**
+ * Format date for display (e.g., "February 4th" or "February 4th, 2027" if year differs from current)
  */
 export function formatDateForDisplay(date: Date): string {
-    return date.toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'long',
-    });
+    const currentYear = new Date().getFullYear();
+    const targetYear = date.getFullYear();
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const day = date.getDate();
+    const ordinalDay = `${day}${getOrdinalSuffix(day)}`;
+
+    if (targetYear !== currentYear) {
+        return `${month} ${ordinalDay}, ${targetYear}`;
+    }
+
+    return `${month} ${ordinalDay}`;
 }
